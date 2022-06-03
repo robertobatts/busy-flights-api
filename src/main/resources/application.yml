@@ -1,0 +1,15 @@
+find-flights:
+  suppliers:
+    CRAZY_AIR:
+      url: http://localhost:8080/crazy-air
+    TOUGH_JET:
+      url: http://localhost:8080/tough-jet
+
+spring:
+  cache:
+    cache-names:
+      - CRAZY_AIR
+      - TOUGH_JET
+    type: caffeine
+  caffeine:
+    spec: expireAfterWrite=1m
