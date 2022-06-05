@@ -1,3 +1,4 @@
+![](https://github.com/robertobatts/busy-flights-api/actions/workflows/maven.yml/badge.svg)
 # Busy Flights Api
 
 ## Introduction
