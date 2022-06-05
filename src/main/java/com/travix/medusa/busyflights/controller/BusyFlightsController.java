@@ -1,14 +1,18 @@
 package com.travix.medusa.busyflights.controller;
 
 import com.travix.medusa.busyflights.domain.busyflights.BusyFlightsRequest;
+import com.travix.medusa.busyflights.domain.busyflights.BusyFlightsResponse;
 import com.travix.medusa.busyflights.domain.busyflights.BusyFlightsResponseList;
 import com.travix.medusa.busyflights.domain.crazyair.CrazyAirRequest;
 import com.travix.medusa.busyflights.domain.crazyair.CrazyAirResponse;
 import com.travix.medusa.busyflights.domain.toughjet.ToughJetRequest;
 import com.travix.medusa.busyflights.domain.toughjet.ToughJetResponse;
 import com.travix.medusa.busyflights.facade.SuppliersFacade;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
@@ -24,9 +28,12 @@ public class BusyFlightsController {
         this.suppliersFacade = suppliersFacade;
     }
 
+    //TODO: make request immutable and bind it with ControllerAdvice and InitBinder
     @GetMapping("/flights")
-    public Mono<BusyFlightsResponseList> findFlights(@Valid BusyFlightsRequest request) {
-        return suppliersFacade.findFlights(request);
+    public Mono<ResponseEntity<BusyFlightsResponseList>> findFlights(@Valid BusyFlightsRequest request) {
+        return suppliersFacade.findFlights(request)
+                .flatMap(response -> Mono.just(ResponseEntity.ok(response)))
+                .switchIfEmpty(Mono.just(ResponseEntity.noContent().build()));
     }
 
     @GetMapping("/crazy-air")

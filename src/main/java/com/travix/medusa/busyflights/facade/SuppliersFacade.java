@@ -8,10 +8,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+import reactor.util.retry.Retry;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 
 @Slf4j
 @Service
@@ -28,10 +32,19 @@ public class SuppliersFacade {
         Flux<BusyFlightsResponse> mergedResponses = Flux.empty();
         for (SupplierService supplierService : supplierServices) {
             Flux<BusyFlightsResponse> responses = supplierService.findFlights(request);
-            mergedResponses = Flux.merge(mergedResponses, responses);
+            responses = responses
+                    .doOnError(t -> log.error("Error Finding flight :: supplier=" + supplierService.getSupplier() + ", request=" + request, t))
+                    .onErrorResume(t -> Flux.fromIterable(supplierService.findFromCache(request, supplierService.getSupplier())));
+            responses.collectList().subscribe(r -> supplierService.updateCache(r, request, supplierService.getSupplier()));
+            mergedResponses = mergedResponses.concatWith(responses);
         }
         return mergedResponses
                 .collectSortedList(Comparator.comparing(BusyFlightsResponse::getFare))
-                .map(responses -> BusyFlightsResponseList.builder().data(responses).build());
+                .mapNotNull(responses -> {
+                    if (responses.isEmpty()) {
+                        return null;
+                    }
+                    return BusyFlightsResponseList.builder().data(responses).build();
+                });
     }
 }

@@ -12,4 +12,4 @@ spring:
       - TOUGH_JET
     type: caffeine
   caffeine:
-    spec: expireAfterWrite=1m
+    spec: maximumSize=500,expireAfterWrite=1h

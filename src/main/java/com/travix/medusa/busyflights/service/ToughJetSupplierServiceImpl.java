@@ -23,6 +23,7 @@ public class ToughJetSupplierServiceImpl extends SupplierService {
         super(webClientBuilder, findFlightsProperties, TOUGH_JET);
     }
 
+    @Override
     @Cacheable(value = "TOUGH_JET")
     public Flux<BusyFlightsResponse> findFlights(BusyFlightsRequest busyFlightsRequest) {
         ToughJetRequest request = ToughJetRequestConverter.fromBusyFlightsRequest(busyFlightsRequest);

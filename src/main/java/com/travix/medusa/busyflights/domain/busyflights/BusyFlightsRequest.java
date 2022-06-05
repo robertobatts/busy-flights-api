@@ -2,15 +2,15 @@ package com.travix.medusa.busyflights.domain.busyflights;
 
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.extern.jackson.Jacksonized;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import java.time.LocalDate;
 
 @Data
 @Builder
+@Jacksonized
 public class BusyFlightsRequest {
 
     @NotBlank
@@ -18,11 +18,10 @@ public class BusyFlightsRequest {
     @NotBlank
     private String destination;
     @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate departureDate;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate returnDate;
+    private String departureDate;
+    private String returnDate;
+    @NotNull
     @Positive
-    private int numberOfPassengers;
+    private Integer numberOfPassengers;
 
 }

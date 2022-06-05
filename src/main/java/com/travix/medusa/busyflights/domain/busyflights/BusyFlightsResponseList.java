@@ -1,14 +1,14 @@
 package com.travix.medusa.busyflights.domain.busyflights;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 
 import java.util.List;
 
 @Data
 @Builder
-@AllArgsConstructor
+@Jacksonized
 public class BusyFlightsResponseList {
 
     private List<BusyFlightsResponse> data;

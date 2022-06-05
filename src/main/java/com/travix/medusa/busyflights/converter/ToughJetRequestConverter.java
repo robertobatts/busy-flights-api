@@ -14,10 +14,10 @@ public class ToughJetRequestConverter {
         ToughJetRequest.ToughJetRequestBuilder builder = ToughJetRequest.builder()
                 .from(busyFlightsRequest.getOrigin())
                 .to(busyFlightsRequest.getDestination())
-                .outboundDate(busyFlightsRequest.getDepartureDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                .outboundDate(busyFlightsRequest.getDepartureDate())
                 .numberOfAdults(busyFlightsRequest.getNumberOfPassengers());
         if (busyFlightsRequest.getReturnDate() != null) {
-            builder.inboundDate(busyFlightsRequest.getReturnDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
+            builder.inboundDate(busyFlightsRequest.getReturnDate());
         }
         return builder.build();
     }

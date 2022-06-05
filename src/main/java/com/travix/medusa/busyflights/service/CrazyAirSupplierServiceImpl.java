@@ -23,6 +23,7 @@ public class CrazyAirSupplierServiceImpl extends SupplierService {
         super(webClientBuilder, findFlightsProperties, CRAZY_AIR);
     }
 
+    @Override
     @Cacheable(value = "CRAZY_AIR")
     public Flux<BusyFlightsResponse> findFlights(BusyFlightsRequest busyFlightsRequest) {
         CrazyAirRequest request = CrazyAirRequestConverter.fromBusyFlightsRequest(busyFlightsRequest);
