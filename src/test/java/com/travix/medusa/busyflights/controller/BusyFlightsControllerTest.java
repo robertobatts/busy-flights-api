@@ -1,5 +1,6 @@
 package com.travix.medusa.busyflights.controller;
 
+import com.travix.medusa.busyflights.domain.busyflights.BusyFlightsErrorResponse;
 import com.travix.medusa.busyflights.domain.busyflights.BusyFlightsResponse;
 import com.travix.medusa.busyflights.domain.busyflights.BusyFlightsResponseList;
 import com.travix.medusa.busyflights.facade.SuppliersFacade;
@@ -17,6 +18,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @WebFluxTest
 class BusyFlightsControllerTest {
@@ -80,11 +82,7 @@ class BusyFlightsControllerTest {
         queryParams.add("departureDate", "2022-10-12");
         queryParams.add("returnDate", "2022-09-13");
         queryParams.add("numberOfPassengers", "1");
-        client
-                .get()
-                .uri(uriBuilder -> uriBuilder.path(GET_FLIGHTS_URI).queryParams(queryParams).build())
-                .exchange()
-                .expectStatus().isBadRequest();
+        givenNotValidQueryParams_thenBadRequest(queryParams);
     }
 
     @Test
@@ -95,11 +93,7 @@ class BusyFlightsControllerTest {
         queryParams.add("departureDate", "12-10-2022");
         queryParams.add("returnDate", "2022/09/13");
         queryParams.add("numberOfPassengers", "1");
-        client
-                .get()
-                .uri(uriBuilder -> uriBuilder.path(GET_FLIGHTS_URI).queryParams(queryParams).build())
-                .exchange()
-                .expectStatus().isBadRequest();
+        givenNotValidQueryParams_thenBadRequest(queryParams);
     }
 
     @Test
@@ -130,11 +124,26 @@ class BusyFlightsControllerTest {
         queryParams.add("returnDate", "2022-10-13");
         queryParams.add("numberOfPassengers", "1");
         queryParams.remove(missingParameter);
-        client
+
+        givenNotValidQueryParams_thenBadRequest(queryParams);
+    }
+
+    private void givenNotValidQueryParams_thenBadRequest(MultiValueMap<String, String> queryParams) {
+        var errorResponseFlux = client
                 .get()
                 .uri(uriBuilder -> uriBuilder.path(GET_FLIGHTS_URI).queryParams(queryParams).build())
                 .exchange()
-                .expectStatus().isBadRequest();
+                .expectStatus().isBadRequest()
+                .returnResult(BusyFlightsErrorResponse.class)
+                .getResponseBody();
+
+        StepVerifier.create(errorResponseFlux)
+                .expectNextMatches(errorResponse -> {
+                    assertThat(errorResponse.getStatus()).isEqualTo(400);
+                    assertThat(errorResponse.getMessage()).isNotBlank();
+                    assertThat(errorResponse.getIncidentId()).isNotBlank();
+                    return true;
+                }).verifyComplete();
     }
 
 
