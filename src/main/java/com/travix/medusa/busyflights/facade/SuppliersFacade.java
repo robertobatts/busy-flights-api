@@ -8,14 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-import reactor.util.retry.Retry;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Function;
 
 @Slf4j
 @Service
@@ -27,6 +23,11 @@ public class SuppliersFacade {
         this.supplierServices = Collections.unmodifiableList(supplierServices);
     }
 
+    /**
+     * This method fetches call all the supplier services.
+     * If a supplierService fails, then cache is called. If cache is empty, then return empty;
+     * All the supplier responses are then merged and sorted by price and they are returned
+     */
     public Mono<BusyFlightsResponseList> findFlights(BusyFlightsRequest request) {
         log.debug("Finding flights :: request={}", request);
         Flux<BusyFlightsResponse> mergedResponses = Flux.empty();

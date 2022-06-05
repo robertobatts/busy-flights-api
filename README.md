@@ -1,98 +1,46 @@
-**Travix - Problem to be solved**
+# Busy Flights Api
 
-**Background:**
+## Introduction
+The purpose of this document is to describe the behaviour and the design of busy-flights-api.
+The requirements are described in [requirements.md](./requirements.md).
 
-BusyFlights is a flights search solution which aggregates flight results initially from 2 different suppliers (CrazyAir and ToughJet). A future iteration (not part of the test) may add more suppliers.
+## Assumptions
+During the development, a few assumptions have been made that are not covered by the requirements:
+- All the request objects are supposed to be consumed as query parameters, not as request bodies by the apis
+- All the fields in `BusyFlightsRequest` are all required, except for `returnDate` which is optional
+- `ToughGetRequest.discount` is a percentage in the format 0 to 100 (0% to 100%)
+- CrazyAir and ToughJet responses are a list of `CrazyAirResponse` and `ToughJetResponse` since no other data structure is defined for it in the requirement. Even if it doesn't follow best practises, I left it like this because I cannot have control on the structure of external services
+- BusyFlights response is instead `BusyFlightsResponseList`, which is a wrapper of `BusyFlightsResponse` following best practises. This allows to add new parameters in the response in the future (such as paging), maintaining backward compatibility
 
+## Changes to initial codebase
+- I upgraded the java version from 8 to 11 to use the updated api of List and Files
+- All the domain objects have been modified with Lombok to reduce boilerplate code
+- I upgraded spring boot version to the latest stable release
 
-**What is required:**
+## Flow
+For each request all the suppliers apis are fetched asynchronously following reactive programming paradigms.
+If the request fails, SuppliersFacade applies a fallback strategy, it retrieves the value from a cache if present.
+After fetching all the suppliers, the responses are merged in a single object.
 
-Use this GitHub repository as a base to implement the Busy Flights service that should produce an aggregated result from both CrazyAir and ToughJet.
-The result should be a JSON response which contains a list of flights ordered by fare which has the following attributes:
+![flowDiagram](./docs/flowDiagram.png)
 
-**Busy Flights API**
+## How to integrate new suppliers
+### SupplierService
+Create a class that extends `SupplierService`, which has the duty of converting BusyFlights objects to the supplier objects,
+and fetching the suppliers.
 
-**Request**
+The constructor of this implementation should pass the name of the supplier to its superclass, therefore you need to add the new supplier to the enum `Supplier`
 
-| Name | Description |
-| ------ | ------ |
-| origin | 3 letter IATA code(eg. LHR, AMS) |
-| destination | 3 letter IATA code(eg. LHR, AMS) |
-| departureDate | ISO_LOCAL_DATE format |
-| returnDate | ISO_LOCAL_DATE format |
-| numberOfPassengers | Maximum 4 passengers |
+### application.yml
+You need to add the new supplier name and url in `application.yml`. This configuration will be injected in the bean `FindFlightsProperties`,
+and the url will be automatically matched by `SupplierService`.
 
-**Response**
-
-| Name | Description |
-| ------ | ------ |
-| airline | Name of Airline |
-| supplier | Eg: CrazyAir or ToughJet |
-| fare | Total price rounded to 2 decimals |
-| departureAirportCode | 3 letter IATA code(eg. LHR, AMS) |
-| destinationAirportCode | 3 letter IATA code(eg. LHR, AMS) |
-| departureDate | ISO_DATE_TIME format |
-| arrivalDate | ISO_DATE_TIME format |
-
-The service should connect to the both the suppliers using HTTP.
-
-**CrazyAir API**
-
-**Request**
-
-| Name | Description |
-| ------ | ------ |
-| origin | 3 letter IATA code(eg. LHR, AMS) |
-| destination | 3 letter IATA code(eg. LHR, AMS) |
-| departureDate | ISO_LOCAL_DATE format |
-| returnDate | ISO_LOCAL_DATE format |
-| passengerCount | Number of passengers |
-
-**Response**
-
-
-| Name | Description |
-| ------ | ------ |
-| airline | Name of the airline |
-| price | Total price |
-| cabinclass | E for Economy and B for Business |
-| departureAirportCode | Eg: LHR |
-| destinationAirportCode | Eg: LHR |
-| departureDate | ISO_LOCAL_DATE_TIME format |
-| arrivalDate | ISO_LOCAL_DATE_TIME format |
-
-**ToughJet API**
-
-**Request**
-
-| Name | Description |
-| ------ | ------ |
-| from | 3 letter IATA code(eg. LHR, AMS) |
-| to | 3 letter IATA code(eg. LHR, AMS) |
-| outboundDate |ISO_LOCAL_DATE format |
-| inboundDate | ISO_LOCAL_DATE format |
-| numberOfAdults | Number of passengers |
-
-**Response**
-
-| Name | Description |
-| ------ | ------ |
-| carrier | Name of the Airline |
-| basePrice | Price without tax(doesn't include discount) |
-| tax | Tax which needs to be charged along with the price |
-| discount | Discount which needs to be applied on the price(in percentage) |
-| departureAirportName | 3 letter IATA code(eg. LHR, AMS) |
-| arrivalAirportName | 3 letter IATA code(eg. LHR, AMS) |
-| outboundDateTime | ISO_INSTANT format |
-| inboundDateTime | ISO_INSTANT format |
-
-**What you need to provide:**
-
-- A solution that meets the above requirements.
-- The implementation should be made as close to 'production ready' as possible within the time constraints.
-
-It is fine to change any of the supplied application code, if you choose to do so please add comments to indicate what has changed and why.
-
-**Note**
-
-Please clone this project then create your own repository from it. Do not fork/branch this project when creating your solution as it will be visible to other applicants.
+The only key configurable per supplier is url at the moment, but if the new suppliers need new properties, e.g. apiKey, you can easily integrate it by modifying the application properties
+```yml
+find-flights:
+  suppliers:
+    NEW_SUPPLIER: 
+      url: <set_url_here>
+      apiKey: <set_api_key_here>
+```
+and then add the new apiKey field to the class `SupplierProperties`. Doing this will make the new properties automatically accessible by `SupplierService`

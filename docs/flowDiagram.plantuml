@@ -1,0 +1,42 @@
+@startuml
+!theme aws-orange
+autonumber
+actor Client
+participant SuppliersFacade
+collections ListOfSupplierService
+participant WebClient
+database CaffeineCache
+entity Configuration
+
+== Get flights ==
+Client -> SuppliersFacade: GET /flights
+activate SuppliersFacade
+
+SuppliersFacade -> ListOfSupplierService: find flights \nforeach supplierService
+activate ListOfSupplierService
+
+ListOfSupplierService -> Configuration: get url
+activate Configuration
+return url
+
+ListOfSupplierService -> WebClient: fetch url
+activate WebClient
+return response
+ListOfSupplierService -> ListOfSupplierService: convert response to BusyFlight
+return response
+
+activate SuppliersFacade #Green
+SuppliersFacade -> CaffeineCache: if success then update cache
+deactivate SuppliersFacade
+SuppliersFacade-[hidden]->SuppliersFacade
+
+activate SuppliersFacade #DarkSalmon
+SuppliersFacade -> CaffeineCache: if error then get from cache
+activate CaffeineCache
+return response
+deactivate SuppliersFacade
+
+SuppliersFacade -> SuppliersFacade: merge all suppliers responses
+
+return response
+@enduml
