@@ -7,9 +7,7 @@ find-flights:
 
 spring:
   cache:
-    cache-names:
-      - CRAZY_AIR
-      - TOUGH_JET
+    cache-names: flights
     type: caffeine
   caffeine:
     spec: maximumSize=500,expireAfterWrite=1h

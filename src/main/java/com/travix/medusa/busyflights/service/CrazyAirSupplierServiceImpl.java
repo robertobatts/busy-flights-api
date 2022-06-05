@@ -8,7 +8,6 @@ import com.travix.medusa.busyflights.domain.crazyair.CrazyAirRequest;
 import com.travix.medusa.busyflights.domain.crazyair.CrazyAirResponse;
 import com.travix.medusa.busyflights.properties.FindFlightsProperties;
 import com.travix.medusa.busyflights.utils.WebRequestUtils;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -24,7 +23,6 @@ public class CrazyAirSupplierServiceImpl extends SupplierService {
     }
 
     @Override
-    @Cacheable(value = "CRAZY_AIR")
     public Flux<BusyFlightsResponse> findFlights(BusyFlightsRequest busyFlightsRequest) {
         CrazyAirRequest request = CrazyAirRequestConverter.fromBusyFlightsRequest(busyFlightsRequest);
         return webClient.get()

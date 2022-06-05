@@ -1,16 +1,14 @@
 package com.travix.medusa.busyflights.domain.busyflights;
 
 import lombok.Builder;
-import lombok.Data;
-import lombok.extern.jackson.Jacksonized;
+import lombok.Value;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-@Data
+@Value
 @Builder
-@Jacksonized
 public class BusyFlightsRequest {
 
     @NotBlank

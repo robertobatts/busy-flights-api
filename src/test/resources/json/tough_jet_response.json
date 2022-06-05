@@ -1,0 +1,22 @@
+[
+  {
+    "carrier": "An airline name",
+    "price": 60,
+    "tax": 20,
+    "discount": 50,
+    "outboundDateTime": "2022-10-01T13:15:30Z",
+    "inboundDateTime": "2022-10-02T18:25:30Z",
+    "departureAirportName": "STN",
+    "arrivalAirportName": "DUB"
+  },
+  {
+    "carrier": "An airline name",
+    "price": 80,
+    "tax": 20,
+    "discount": 50,
+    "outboundDateTime": "2022-10-01T12:15:30Z",
+    "inboundDateTime": "2022-10-02T13:25:30Z",
+    "departureAirportName": "STN",
+    "arrivalAirportName": "DUB"
+  }
+]

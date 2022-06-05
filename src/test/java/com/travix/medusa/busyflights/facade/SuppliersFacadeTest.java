@@ -99,7 +99,6 @@ class SuppliersFacadeTest {
         Mono<BusyFlightsResponseList> responseListMono = suppliersFacade.findFlights(BusyFlightsRequest.builder().build());
 
         StepVerifier.create(responseListMono)
-                .expectNext(BusyFlightsResponseList.builder().data(Collections.emptyList()).build())
                 .verifyComplete();
     }
 

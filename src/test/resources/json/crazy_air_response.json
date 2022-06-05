@@ -1,0 +1,11 @@
+[
+  {
+    "airline": "An airline name",
+    "price": 50,
+    "cabinclass": "economy",
+    "departureDate": "2022-10-01T10:15:30",
+    "arrivalDate": "2022-10-02T12:25:30",
+    "departureAirportCode": "STN",
+    "arrivalAirportCode": "DUB"
+  }
+]

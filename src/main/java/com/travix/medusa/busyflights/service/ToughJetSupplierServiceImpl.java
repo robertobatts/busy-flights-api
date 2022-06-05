@@ -8,7 +8,6 @@ import com.travix.medusa.busyflights.domain.toughjet.ToughJetRequest;
 import com.travix.medusa.busyflights.domain.toughjet.ToughJetResponse;
 import com.travix.medusa.busyflights.properties.FindFlightsProperties;
 import com.travix.medusa.busyflights.utils.WebRequestUtils;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -24,7 +23,6 @@ public class ToughJetSupplierServiceImpl extends SupplierService {
     }
 
     @Override
-    @Cacheable(value = "TOUGH_JET")
     public Flux<BusyFlightsResponse> findFlights(BusyFlightsRequest busyFlightsRequest) {
         ToughJetRequest request = ToughJetRequestConverter.fromBusyFlightsRequest(busyFlightsRequest);
         return webClient.get()

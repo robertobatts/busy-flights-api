@@ -1,0 +1,8 @@
+wiremock.server.port: 8090
+
+find-flights:
+  suppliers:
+    CRAZY_AIR:
+      url: http://localhost:${wiremock.server.port}/test-crazy-air
+    TOUGH_JET:
+      url: http://localhost:${wiremock.server.port}/test-tough-jet
